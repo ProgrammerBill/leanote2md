@@ -8,6 +8,7 @@ import lea
 from utils import *
 
 from anytree import Node, RenderTree
+from getpass import getpass
 
 def _get_parent_node(nb_id, id_to_parent_id, id_to_node, id_to_title, root_node):
     """Get parent node of notebook @nb_id.
@@ -30,7 +31,7 @@ def get_notebooks_paths(notebooks):
 
     Args:
         notebooks: List of notebooks' info.
-    
+
     Returns:
         Dict that maps a notebook's id to its path.
     """
@@ -64,12 +65,12 @@ def save_image(url, img_path, forced_save=False):
         url: Url of image.
         img_path: Path to save the image.
         forced_save: Force to save images if True.
-        
+
     Returns:
         Filename
     """
     if '/api/file/getImage' in url:
-        image_id = re.sub(r'.*fileId=(.*).*', r'\1', url) 
+        image_id = re.sub(r'.*fileId=(.*).*', r'\1', url)
         filename = image_id + '.png'
         file_path = Path(img_path) / filename
         if not os.path.exists(file_path) or forced_save:
@@ -102,8 +103,8 @@ def localize_image_link(content, img_path, img_link_path, forced_save=False):
 
     return img_link_pattern.sub(_change_link, content)
 
-def save_note_as_md(note, nb_id_to_paths, output_path='./', img_path='./images', 
-                    img_link_path='./images', localize_image=True, 
+def save_note_as_md(note, nb_id_to_paths, output_path='./', img_path='./images',
+                    img_link_path='./images', localize_image=True,
                     forced_save=False, add_hexo_meta=True, only_blog=True):
     """Save note to $output_path and referenced images to $img_path.
 
@@ -135,8 +136,8 @@ def save_note_as_md(note, nb_id_to_paths, output_path='./', img_path='./images',
         'date': created_time,
         'tags': tags,
     }
-    
-    final_path = Path(output_path) 
+
+    final_path = Path(output_path)
     folder = nb_id_to_paths.get(note['NotebookId'])
     if folder:
         final_path /= folder
@@ -186,12 +187,15 @@ if __name__ == '__main__':
             forced_save = False
     else:
         import config
-        email = config.email
-        pwd = config.pwd
+        #email = config.email
+        email = input("Input account's email: ")
+        pwd = getpass()
+        #pwd = config.pwd
         output_path = config.output_path
         only_blog = config.only_blog
         localize_image = config.localize_image
         img_path = config.img_path
+        img_header_path = config.img_header_path
         img_link_path = config.img_link_path
         forced_save = config.forced_save
 
