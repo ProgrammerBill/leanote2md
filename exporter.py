@@ -131,9 +131,20 @@ def save_note_as_md(note, nb_id_to_paths, output_path='./', img_path='./images',
     created_time = note['CreatedTime']
     content = note['Content']
 
+    post = 'post'
+    author='Bill'
+    date_pattern = re.compile(r'\d{4}(\-|\/|.)\d{1,2}\1\d{1,2}')
+    date_name = date_pattern.search(created_time).group()
+    img = 'img/bill/header-posts/' + date_name + '-header.jpg'
+    summary = ''
+
     hexo_meta_header = {
+        'layout': post,
         'title': title,
+        'summary': summary,
         'date': created_time,
+        'author': author,
+        'header-img': img,
         'tags': tags,
     }
 
