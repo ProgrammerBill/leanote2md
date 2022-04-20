@@ -3,6 +3,7 @@
 from pathlib import Path
 import re
 import sys
+import os
 
 import lea
 from utils import *
@@ -58,7 +59,7 @@ def get_notebooks_paths(notebooks):
         nb_id_to_paths[node.id] = path
     return nb_id_to_paths
 
-def save_image(url, img_path, forced_save=False):
+def save_image(url, img_path, forced_save=False, new_file_name=''):
     """Download image from @url and save it to @img_path.
 
     Args:
@@ -71,7 +72,10 @@ def save_image(url, img_path, forced_save=False):
     """
     if '/api/file/getImage' in url:
         image_id = re.sub(r'.*fileId=(.*).*', r'\1', url)
-        filename = image_id + '.png'
+        if new_file_name != '':
+            filename = new_file_name
+        else :
+            filename = image_id + '.png'
         file_path = Path(img_path) / filename
         if not os.path.exists(file_path) or forced_save:
             img = lea.get_image(image_id)
@@ -82,7 +86,7 @@ def save_image(url, img_path, forced_save=False):
         # FIXME: Deal with image from other places.
         return ''
 
-def localize_image_link(content, img_path, img_link_path, forced_save=False):
+def localize_image_link(content, img_path, img_header_path, img_link_path, hexo_meta_header, forced_save=False):
     """Localize image links in @content.
 
     Download all images in content, change the link to local path.
@@ -90,16 +94,23 @@ def localize_image_link(content, img_path, img_link_path, forced_save=False):
     Args:
         content: Content to parse.
         img_path: Path to save the referenced images in note.
+        img_header_path: Path to save the referenced images of header in note.
         img_link_path: Path to access image.
         forced_save: Force to save images if True.
     """
     mkdir_p(img_path)
+    mkdir_p(img_header_path)
 
     img_link_pattern = re.compile(r'!\[(.*?)\]\((.*?)\)')
     def _change_link(m):
+        title = m.group(1)
         url = m.group(2)
-        filename = save_image(url, img_path, forced_save)
-        return '![{}]({})'.format(m.group(1), img_link_path + '/' + filename)
+        if title == 'header-img':
+            filename = save_image(url, img_header_path, forced_save, new_file_name=os.path.basename(hexo_meta_header['header-img']))
+            return ''
+        else:
+            filename = save_image(url, img_path, forced_save)
+            return '![{}]({})'.format(m.group(1), img_link_path + '/' + filename)
 
     return img_link_pattern.sub(_change_link, content)
 
@@ -154,6 +165,7 @@ def save_note_as_md(note, nb_id_to_paths, output_path='./', img_path='./images',
         final_path /= folder
     mkdir_p(final_path)
 
+    title = date_name + '-' + title;
     title = title.strip()
     title = windows_filename_filter(title)
     title += '.md'
@@ -161,7 +173,7 @@ def save_note_as_md(note, nb_id_to_paths, output_path='./', img_path='./images',
     print('Saving note %s' % (filepath))
 
     if localize_image:
-        content = localize_image_link(content, img_path, img_link_path, forced_save)
+        content = localize_image_link(content, img_path, img_header_path, img_link_path, hexo_meta_header, forced_save)
 
     try:
         with open(filepath, 'w', encoding='utf-8') as fd:
