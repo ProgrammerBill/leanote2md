@@ -148,6 +148,17 @@ def save_note_as_md(note, nb_id_to_paths, output_path='./', img_path='./images',
     date_name = date_pattern.search(created_time).group()
     img = 'img/bill/header-posts/' + date_name + '-header.jpg'
     summary = ''
+    catalog = 'false'
+    stickie = 'false'
+    life = 'false'
+    if note['Tags']:
+        for t in note['Tags']:
+            if t == '#catalog':
+                catalog = 'true'
+            elif t == '#stickie':
+                stickie = 'true'
+            elif t == '#life':
+                life = 'true'
 
     hexo_meta_header = {
         'layout': post,
@@ -156,6 +167,9 @@ def save_note_as_md(note, nb_id_to_paths, output_path='./', img_path='./images',
         'date': created_time,
         'author': author,
         'header-img': img,
+        'catalog': catalog,
+        'stickie': stickie,
+        'life': life,
         'tags': tags,
     }
 
