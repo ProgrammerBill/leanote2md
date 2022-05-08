@@ -26,6 +26,6 @@ img_path = '../img/bill/in-posts/'
 # For instance:
 #   - Original link: ![](https://web.image.com/my_image.png)
 #   - If set this var: ![](/images/my_image.png)
-img_link_path = '/images'
+img_link_path = '/img/bill/in-posts/'
 # Force to save images if True, even though already downloaded
 forced_save = False
