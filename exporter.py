@@ -159,6 +159,9 @@ def save_note_as_md(note, nb_id_to_paths, output_path='./', img_path='./images',
                 stickie = 'true'
             elif t == '#life':
                 life = 'true'
+            elif "#summary=" in t:
+                summary_pattern=re.compile('#summary=([A-Za-z\u4e00-\u9fa5]*)')
+                summary = summary_pattern.search(t).group(1)
 
     hexo_meta_header = {
         'layout': post,
