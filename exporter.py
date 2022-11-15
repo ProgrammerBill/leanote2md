@@ -148,9 +148,11 @@ def save_note_as_md(note, nb_id_to_paths, output_path='./', img_path='./images',
     date_name = date_pattern.search(created_time).group()
     img = 'img/bill/header-posts/' + date_name + '-header.jpg'
     summary = ''
+    subtitle = ''
     catalog = 'false'
     stickie = 'false'
     life = 'false'
+    guitartab = 'false'
     if note['Tags']:
         for t in note['Tags']:
             if t == '#catalog':
@@ -159,15 +161,19 @@ def save_note_as_md(note, nb_id_to_paths, output_path='./', img_path='./images',
                 stickie = 'true'
             elif t == '#life':
                 life = 'true'
+            elif t == '#guitartab':
+                guitartab = 'true'
             elif "#summary=" in t:
                 summary_pattern=re.compile('#summary=([A-Za-z\u4e00-\u9fa5]*)')
                 summary = summary_pattern.search(t).group(1)
+            elif "#subtitle=" in t:
+                subtitle_pattern=re.compile('#subtitle=([A-Za-z\u4e00-\u9fa5]*)')
+                subtitle = subtitle_pattern.search(t).group(1)
+
 
     hexo_meta_header = {
         'layout': post,
         'title': title,
-        'summary': summary,
-        'date': created_time,
         'author': author,
         'header-img': img,
         'catalog': catalog,
@@ -175,6 +181,12 @@ def save_note_as_md(note, nb_id_to_paths, output_path='./', img_path='./images',
         'life': life,
         'tags': tags,
     }
+    if guitartab != '':
+        hexo_meta_header['guitartab'] = guitartab
+    if subtitle != '':
+        hexo_meta_header['subtitle'] = subtitle
+    if summary != '':
+        hexo_meta_header['summary'] = summary
 
     final_path = Path(output_path)
     folder = nb_id_to_paths.get(note['NotebookId'])
